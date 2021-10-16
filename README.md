@@ -1,4 +1,5 @@
-# mini-router
+# mini-router 实现简易版本的vue-router功能
+code in "/router/mini-router.js"
 
 ## Project setup
 ```
