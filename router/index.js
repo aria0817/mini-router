@@ -9,6 +9,7 @@ import testB from '../src/components/testB.vue'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
+    // mode:'history',
     routes: [
         // 动态路径参数 以冒号开头
         {

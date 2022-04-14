@@ -6,19 +6,30 @@ class VueRouter {
     // 可以拿到options 中有router
     constructor(options) {
         this.$options = options;
+        this.mode = options.mode;
         // 获取当前hash值 
         // console.log(window.location.hash);
         // 但是current 不是响应式，所以触发不了组件的render函数，页面不会发生变化。所以使用Vue.util.defineReactive
         // 让数据变成响应式 
 
-        const initData = window.location.hash.slice(1) || '/';
-        Vue.util.defineReactive(this, 'current', initData)
+        // const initData = window.location.hash.slice(1) || '/';
+
+        Vue.util.defineReactive(this, 'current', '/')
+       
+        
         // hash change的时候 修改当前url 
-        window.addEventListener('hashchange', this.onHashChange.bind(this))
+        if(this.mode === 'history'){
+            window.addEventListener('popstate',this.onHistory.bind(this));
+        }else{
+            window.addEventListener('hashchange', this.onHashChange.bind(this))
+        }
     }
 
     onHashChange() {
         this.current = window.location.hash.slice(1)
+    }
+    onHistory(){
+        this.current = window.location.pathname
     }
 
 
@@ -42,6 +53,7 @@ VueRouter.install = function (_Vue) {
     // 注册两个组件 
     // 根据to 来切换url 
     // 在组件中内容可以用slots拿到
+
     Vue.component('router-link', {
         props: {
             to: String
@@ -50,10 +62,24 @@ VueRouter.install = function (_Vue) {
             return h('a', {
                 attrs: {
                     href: '#' + this.to
-                }
+                },
+                on: {
+                    click: this.clickHandler
+                  }
             }, [
                 this.$slots.default
             ])
+        },
+        methods:{
+            clickHandler(e){
+                
+                if(this.$router.$options.mode === 'history'){
+                    history.pushState({}, '', this.to)
+                    e.preventDefault();
+                }
+                this.current = this.to;
+               
+            }
         }
     })
 
